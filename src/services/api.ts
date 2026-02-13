@@ -6,6 +6,8 @@ import type {
   PatientDetailResponse,
   DriverDetailResponse,
   RidesResponse,
+  AmbulanceType,
+  FareRateItem,
 } from '../types';
 
 const API_BASE_URL = 'https://api.gyankunjkutir.com/api/v1';
@@ -188,7 +190,79 @@ export const deletePatient = async (id: string): Promise<DeleteResponse> => {
 
 // Delete driver
 export const deleteDriver = async (id: string): Promise<DeleteResponse> => {
-  return apiCall<DeleteResponse>(`/driver/deleteDriver?id=${id}`, {
+  return apiCall<DeleteResponse>(`/driver/deletedriver?id=${id}`, {
     method: 'DELETE',
+  });
+};
+
+// --- Ambulance Types ---
+
+export interface AmbulanceTypesListResponse {
+  code: number;
+  message: string;
+  data: AmbulanceType[] | { ambulanceTypes?: AmbulanceType[]; list?: AmbulanceType[]; total?: number };
+}
+
+export const getAllAmbulanceTypes = async (
+  params?: { pageNo?: number; pageSize?: number }
+): Promise<AmbulanceTypesListResponse> => {
+  const queryParams = new URLSearchParams();
+  if (params?.pageNo !== undefined) queryParams.append('pageNo', params.pageNo.toString());
+  if (params?.pageSize !== undefined) queryParams.append('pageSize', params.pageSize.toString());
+  const qs = queryParams.toString();
+  return apiCall<AmbulanceTypesListResponse>(
+    `/ambulanceType/getAllambulanceType${qs ? `?${qs}` : ''}`,
+    { method: 'GET' }
+  );
+};
+
+export interface AddAmbulanceTypeRequest {
+  name: string;
+  slug: string;
+  baseFare: string;
+  fareRate: FareRateItem[];
+  description?: string;
+  image?: string;
+}
+
+export const addAmbulanceType = async (
+  body: AddAmbulanceTypeRequest
+): Promise<DeleteResponse> => {
+  return apiCall<DeleteResponse>('/ambulanceType/addAmbulanceType', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+};
+
+export interface UpdateAmbulanceTypeRequest {
+  id: string;
+  baseFare?: string;
+  fareRate?: FareRateItem[];
+  name?: string;
+  slug?: string;
+  description?: string;
+  image?: string;
+}
+
+export const updateAmbulanceType = async (
+  body: UpdateAmbulanceTypeRequest
+): Promise<DeleteResponse> => {
+  return apiCall<DeleteResponse>('/ambulanceType/updateAmbulanceType', {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+};
+
+export interface ToggleAmbulanceTypeRequest {
+  id: string;
+  isDeleted: boolean;
+}
+
+export const toggleAmbulanceType = async (
+  body: ToggleAmbulanceTypeRequest
+): Promise<DeleteResponse> => {
+  return apiCall<DeleteResponse>('/ambulanceType/toggleAmbulanceType', {
+    method: 'PUT',
+    body: JSON.stringify(body),
   });
 };

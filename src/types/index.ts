@@ -144,3 +144,28 @@ export interface RidesResponse {
   message: string;
   data: Ride[];
 }
+
+// Ambulance Type (for sidebar Ambulance management)
+export interface FareRateItem {
+  range: string;
+  rate: string;
+}
+
+export interface AmbulanceType {
+  _id: string;
+  name: string;
+  slug: string;
+  baseFare: string;
+  fareRate: FareRateItem[];
+  description?: string;
+  image?: string;
+  isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AmbulanceTypesResponse {
+  code: number;
+  message: string;
+  data: AmbulanceType[] | { ambulanceTypes: AmbulanceType[]; total?: number };
+}
