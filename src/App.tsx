@@ -8,6 +8,7 @@ import PatientDetail from './pages/PatientDetail';
 import Drivers from './pages/Drivers';
 import DriverDetail from './pages/DriverDetail';
 import Rides from './pages/Rides';
+import RideDetail from './pages/RideDetail';
 import Ambulances from './pages/Ambulances';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -67,6 +68,14 @@ const AppRoutes: React.FC = () => {
             <Layout>
               <Rides />
             </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rides/:orderId"
+        element={
+          <ProtectedRoute>
+            <RideDetail />
           </ProtectedRoute>
         }
       />

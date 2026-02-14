@@ -6,6 +6,7 @@ import type {
   PatientDetailResponse,
   DriverDetailResponse,
   RidesResponse,
+  RideDetailResponse,
   AmbulanceType,
   FareRateItem,
 } from '../types';
@@ -173,6 +174,14 @@ export const getAllRides = async (
   return apiCall<RidesResponse>(endpoint, {
     method: 'GET',
   });
+};
+
+// Get ride by order ID (full detail)
+export const getRideByOrderId = async (orderId: string): Promise<RideDetailResponse> => {
+  return apiCall<RideDetailResponse>(
+    `/rideOrder/getRideStatus?orderId=${encodeURIComponent(orderId)}`,
+    { method: 'GET' }
+  );
 };
 
 // Delete patient

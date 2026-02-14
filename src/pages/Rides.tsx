@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAllRides } from '../services/api';
 import type { Ride } from '../types';
 
 const Rides: React.FC = () => {
+  const navigate = useNavigate();
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -227,7 +229,11 @@ const Rides: React.FC = () => {
                   </tr>
                 ) : (
                   rides.map((ride) => (
-                    <tr key={ride._id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={ride._id}
+                      onClick={() => navigate(`/rides/${encodeURIComponent(ride.orderId)}`)}
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {ride.orderId}
                       </td>

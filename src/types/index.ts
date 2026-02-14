@@ -145,6 +145,61 @@ export interface RidesResponse {
   data: Ride[];
 }
 
+// Ride Detail (from getRideStatus)
+export interface RideDestination {
+  _id?: string;
+  address: string;
+  lat: string;
+  long: string;
+}
+
+export interface RideDetailData {
+  _id: string;
+  patientId?: string;
+  driverId?: string;
+  ambulance?: {
+    AmbulanceType: string;
+    vehicleNumber: string;
+    description?: string;
+    image?: string;
+  };
+  source?: {
+    address: string;
+    lat: string;
+    long: string;
+  };
+  destination?: RideDestination[];
+  ridePin?: string;
+  rideStatus: string;
+  discount?: {
+    coupon: string | null;
+    value: string | null;
+  };
+  EstimatedFare?: string;
+  couponDiscount?: string | null;
+  finalAmount?: string;
+  paymentStatus?: string;
+  paymentMode?: string;
+  transactionId?: string | null;
+  isDeleted?: boolean;
+  orderId: string;
+  createdAt: string;
+  updatedAt: string;
+  driverDetails?: Record<string, unknown>;
+  patientDetails: {
+    _id?: string;
+    patientName: string;
+    email: string;
+    phoneNumber: string;
+  };
+}
+
+export interface RideDetailResponse {
+  code: number;
+  message: string;
+  data: RideDetailData[];
+}
+
 // Ambulance Type (for sidebar Ambulance management)
 export interface FareRateItem {
   range: string;
