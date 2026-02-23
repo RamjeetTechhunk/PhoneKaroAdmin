@@ -152,6 +152,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               Reports
             </Link>
 
+            <Link
+              to="/coupons"
+              className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                isActive('/coupons')
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800'
+              }`}
+            >
+              <svg
+                className="w-5 h-5 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 14l2-2 4 4m0 0l-4-4m4 4V7m-9 4h.01M5 21h14a2 2 0 002-2V9.414a2 2 0 00-.586-1.414l-4.414-4.414A2 2 0 0014.586 3H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Coupons
+            </Link>
+
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"

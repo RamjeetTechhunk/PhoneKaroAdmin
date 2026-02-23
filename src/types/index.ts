@@ -224,3 +224,29 @@ export interface AmbulanceTypesResponse {
   message: string;
   data: AmbulanceType[] | { ambulanceTypes: AmbulanceType[]; total?: number };
 }
+
+// Coupons
+export interface Coupon {
+  _id: string;
+  code: string;
+  discountType: 'PERCENT' | 'FLAT' | string;
+  discountValue: number;
+  minOrderAmount?: number;
+  maxDiscountAmount?: number;
+  expiryDate?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CouponsResponse {
+  code: number;
+  message: string;
+  data: Coupon[];
+}
+
+export interface CouponDetailResponse {
+  code: number;
+  message: string;
+  data: Coupon[]; // backend returns an array
+}

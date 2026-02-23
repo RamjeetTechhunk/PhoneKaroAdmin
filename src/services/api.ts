@@ -9,10 +9,13 @@ import type {
   RideDetailResponse,
   AmbulanceType,
   FareRateItem,
+  Coupon,
+  CouponsResponse,
+  CouponDetailResponse,
 } from '../types';
 
 const API_BASE_URL = 'https://api.gyankunjkutir.com/api/v1';
-const API_ORIGIN = "https://api.gyankunjkutir.com/api/v1";
+const ROOT_API_URL = "https://api.gyankunjkutir.com/api/v1";
 
 // Get token from localStorage
 export const getToken = (): string | null => {
@@ -45,6 +48,31 @@ const apiCall = async <T>(
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new Error(error.message || 'Request failed');
+  }
+
+  return response.json();
+};
+
+// Helper for root (non-/api/v1) endpoints like coupons
+const rootApiCall = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
+  const token = getToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${ROOT_API_URL}${path}`, {
     ...options,
     headers,
   });
@@ -178,7 +206,7 @@ export const downloadDriverPatientReport = async (params: {
     fromDate: params.fromDate,
     toDate: params.toDate,
   }).toString();
-  return fetchReportBlob(`${API_ORIGIN}/report/driver-patient?${qs}`);
+  return fetchReportBlob(`${ROOT_API_URL}/report/driver-patient?${qs}`);
 };
 
 export const downloadTotalPatientReport = async (params: { fromDate: string; toDate: string }) => {
@@ -186,7 +214,7 @@ export const downloadTotalPatientReport = async (params: { fromDate: string; toD
     fromDate: params.fromDate,
     toDate: params.toDate,
   }).toString();
-  return fetchReportBlob(`${API_ORIGIN}/report/total-patient?${qs}`);
+  return fetchReportBlob(`${ROOT_API_URL}/report/total-patient?${qs}`);
 };
 
 export const downloadDriverRevenueReport = async (params: { fromDate: string; toDate: string }) => {
@@ -194,7 +222,7 @@ export const downloadDriverRevenueReport = async (params: { fromDate: string; to
     fromDate: params.fromDate,
     toDate: params.toDate,
   }).toString();
-  return fetchReportBlob(`${API_ORIGIN}/report/driver-revenue?${qs}`);
+  return fetchReportBlob(`${ROOT_API_URL}/report/driver-revenue?${qs}`);
 };
 
 export const downloadDailyPatientReport = async (params: { fromDate: string; toDate: string }) => {
@@ -203,6 +231,61 @@ export const downloadDailyPatientReport = async (params: { fromDate: string; toD
     toDate: params.toDate,
   }).toString();
   return fetchReportBlob(`${API_BASE_URL}/report/daily-patient?${qs}`);
+};
+
+// --- Coupons ---
+
+export interface AddCouponRequest {
+  code: string;
+  discountType: string;
+  discountValue: number;
+  minOrderAmount?: number;
+  maxDiscountAmount?: number;
+  expiryDate?: string;
+}
+
+export interface UpdateCouponRequest {
+  id: string;
+  code?: string;
+  discountType?: string;
+  discountValue?: number;
+  minOrderAmount?: number;
+  maxDiscountAmount?: number;
+  expiryDate?: string;
+  isActive?: boolean;
+}
+
+export const getAllCoupons = async (): Promise<CouponsResponse> => {
+  return rootApiCall<CouponsResponse>('/coupon/getAllCoupons', {
+    method: 'GET',
+  });
+};
+
+export const getCouponById = async (id: string): Promise<CouponDetailResponse> => {
+  return rootApiCall<CouponDetailResponse>(`/coupon/getCouponById?id=${id}`, {
+    method: 'GET',
+  });
+};
+
+export const addCoupon = async (body: AddCouponRequest): Promise<CouponDetailResponse> => {
+  return rootApiCall<CouponDetailResponse>('/coupon/addCoupon', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+};
+
+export const updateCoupon = async (body: UpdateCouponRequest): Promise<CouponDetailResponse> => {
+  return rootApiCall<CouponDetailResponse>('/coupon/updateCoupon', {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+};
+
+export const deleteCoupon = async (id: string): Promise<{ code: number; message: string; data?: Coupon }> => {
+  return rootApiCall<{ code: number; message: string; data?: Coupon }>('/coupon/deleteCoupon', {
+    method: 'DELETE',
+    body: JSON.stringify({ id }),
+  });
 };
 
 // Update driver approval status
