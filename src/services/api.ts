@@ -12,6 +12,7 @@ import type {
 } from '../types';
 
 const API_BASE_URL = 'https://api.gyankunjkutir.com/api/v1';
+const API_ORIGIN = "https://api.gyankunjkutir.com/api/v1";
 
 // Get token from localStorage
 export const getToken = (): string | null => {
@@ -116,11 +117,92 @@ export const getAllDrivers = async (
   });
 };
 
+// Get all drivers list (non-paginated usage)
+export const getAllDriversList = async (): Promise<DriversResponse> => {
+  return getAllDrivers({ page: 1, limit: 1000 });
+};
+
 // Get driver by ID
 export const getDriverById = async (id: string): Promise<DriverDetailResponse> => {
   return apiCall<DriverDetailResponse>(`/driver/getdriverById?id=${id}`, {
     method: 'GET',
   });
+};
+
+// --- Reports (file downloads) ---
+const getFilenameFromContentDisposition = (value: string | null): string | null => {
+  if (!value) return null;
+  // Supports: attachment; filename="x.csv" OR filename*=UTF-8''x.csv
+  const filenameStarMatch = value.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+  if (filenameStarMatch?.[1]) {
+    try {
+      return decodeURIComponent(filenameStarMatch[1].trim());
+    } catch {
+      return filenameStarMatch[1].trim();
+    }
+  }
+  const filenameMatch = value.match(/filename\s*=\s*"?([^"]+)"?/i);
+  return filenameMatch?.[1]?.trim() ?? null;
+};
+
+const fetchReportBlob = async (
+  url: string
+): Promise<{ blob: Blob; filename: string | null }> => {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(url, { method: 'GET', headers });
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    try {
+      const parsed = JSON.parse(text) as { message?: string };
+      throw new Error(parsed?.message || 'Request failed');
+    } catch {
+      throw new Error(text || 'Request failed');
+    }
+  }
+
+  const blob = await response.blob();
+  const filename = getFilenameFromContentDisposition(response.headers.get('content-disposition'));
+  return { blob, filename };
+};
+
+export const downloadDriverPatientReport = async (params: {
+  driverId: string;
+  fromDate: string;
+  toDate: string;
+}) => {
+  const qs = new URLSearchParams({
+    driverId: params.driverId,
+    fromDate: params.fromDate,
+    toDate: params.toDate,
+  }).toString();
+  return fetchReportBlob(`${API_ORIGIN}/report/driver-patient?${qs}`);
+};
+
+export const downloadTotalPatientReport = async (params: { fromDate: string; toDate: string }) => {
+  const qs = new URLSearchParams({
+    fromDate: params.fromDate,
+    toDate: params.toDate,
+  }).toString();
+  return fetchReportBlob(`${API_ORIGIN}/report/total-patient?${qs}`);
+};
+
+export const downloadDriverRevenueReport = async (params: { fromDate: string; toDate: string }) => {
+  const qs = new URLSearchParams({
+    fromDate: params.fromDate,
+    toDate: params.toDate,
+  }).toString();
+  return fetchReportBlob(`${API_ORIGIN}/report/driver-revenue?${qs}`);
+};
+
+export const downloadDailyPatientReport = async (params: { fromDate: string; toDate: string }) => {
+  const qs = new URLSearchParams({
+    fromDate: params.fromDate,
+    toDate: params.toDate,
+  }).toString();
+  return fetchReportBlob(`${API_BASE_URL}/report/daily-patient?${qs}`);
 };
 
 // Update driver approval status

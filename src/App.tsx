@@ -10,6 +10,7 @@ import DriverDetail from './pages/DriverDetail';
 import Rides from './pages/Rides';
 import RideDetail from './pages/RideDetail';
 import Ambulances from './pages/Ambulances';
+import Reports from './pages/Reports';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -85,6 +86,16 @@ const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <Layout>
               <Ambulances />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Reports />
             </Layout>
           </ProtectedRoute>
         }

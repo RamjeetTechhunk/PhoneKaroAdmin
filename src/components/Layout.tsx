@@ -128,6 +128,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               Ambulance
             </Link>
 
+            <Link
+              to="/reports"
+              className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                isActive('/reports')
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800'
+              }`}
+            >
+              <svg
+                className="w-5 h-5 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 17v-2m3 2v-6m3 6V7m-9 14h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              Reports
+            </Link>
+
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
