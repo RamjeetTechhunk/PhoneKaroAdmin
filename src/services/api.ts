@@ -100,8 +100,15 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse> =
 };
 
 // Get all patients
-export const getAllPatients = async (): Promise<PatientsResponse> => {
-  return apiCall<PatientsResponse>('/patient/getAllPatient', {
+export const getAllPatients = async (params?: {
+  fromDate?: string;
+  toDate?: string;
+}): Promise<PatientsResponse> => {
+  const queryParams = new URLSearchParams();
+  if (params?.fromDate) queryParams.append('fromDate', params.fromDate);
+  if (params?.toDate) queryParams.append('toDate', params.toDate);
+  const qs = queryParams.toString();
+  return apiCall<PatientsResponse>(`/patient/getAllPatient${qs ? `?${qs}` : ''}`, {
     method: 'GET',
   });
 };
@@ -120,10 +127,12 @@ export const getAllDrivers = async (
     limit?: number;
     search?: string;
     isAvailable?: boolean;
+    fromDate?: string;
+    toDate?: string;
   }
 ): Promise<DriversResponse> => {
   const queryParams = new URLSearchParams();
-  
+
   if (params?.page !== undefined) {
     queryParams.append('page', params.page.toString());
   }
@@ -135,6 +144,12 @@ export const getAllDrivers = async (
   }
   if (params?.isAvailable !== undefined) {
     queryParams.append('isAvailable', params.isAvailable.toString());
+  }
+  if (params?.fromDate) {
+    queryParams.append('fromDate', params.fromDate);
+  }
+  if (params?.toDate) {
+    queryParams.append('toDate', params.toDate);
   }
 
   const queryString = queryParams.toString();
@@ -231,6 +246,45 @@ export const downloadDailyPatientReport = async (params: { fromDate: string; toD
     toDate: params.toDate,
   }).toString();
   return fetchReportBlob(`${API_BASE_URL}/report/daily-patient?${qs}`);
+};
+
+// --- Export to Excel ---
+export const exportToExcelPatient = async (params?: { fromDate?: string; toDate?: string }) => {
+  const qs = new URLSearchParams();
+  if (params?.fromDate) qs.append('fromDate', params.fromDate);
+  if (params?.toDate) qs.append('toDate', params.toDate);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-patient${suffix}`);
+};
+
+export const exportToExcelDrivers = async (params?: {
+  fromDate?: string;
+  toDate?: string;
+  search?: string;
+  isAvailable?: boolean;
+}) => {
+  const qs = new URLSearchParams();
+  if (params?.fromDate) qs.append('fromDate', params.fromDate);
+  if (params?.toDate) qs.append('toDate', params.toDate);
+  if (params?.search) qs.append('search', params.search);
+  if (params?.isAvailable !== undefined) qs.append('isAvailable', String(params.isAvailable));
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-drivers${suffix}`);
+};
+
+export const exportToExcelRidesReport = async (params?: {
+  fromDate?: string;
+  toDate?: string;
+  search?: string;
+  rideStatus?: string;
+}) => {
+  const qs = new URLSearchParams();
+  if (params?.fromDate) qs.append('fromDate', params.fromDate);
+  if (params?.toDate) qs.append('toDate', params.toDate);
+  if (params?.search) qs.append('search', params.search);
+  if (params?.rideStatus) qs.append('rideStatus', params.rideStatus);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-rides-report${suffix}`);
 };
 
 // --- Coupons ---

@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllDrivers, deleteDriver } from '../services/api';
+import { getAllDrivers, deleteDriver, exportToExcelDrivers } from '../services/api';
 import type { Driver } from '../types';
+
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
 
 const Drivers: React.FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -12,8 +23,11 @@ const Drivers: React.FC = () => {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isAvailable, setIsAvailable] = useState<boolean | undefined>(undefined);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
 
   // Debounce search input
@@ -28,7 +42,7 @@ const Drivers: React.FC = () => {
 
   useEffect(() => {
     fetchDrivers();
-  }, [page, limit, search, isAvailable]);
+  }, [page, limit, search, isAvailable, fromDate, toDate]);
 
   const fetchDrivers = async () => {
     try {
@@ -39,6 +53,8 @@ const Drivers: React.FC = () => {
         limit,
         search: search || undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
       });
       setDrivers(response.data.drivers);
       setTotal(response.data.total);
@@ -57,7 +73,31 @@ const Drivers: React.FC = () => {
   const handleAvailabilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setIsAvailable(value === 'all' ? undefined : value === 'true');
-    setPage(1); // Reset to first page when filtering
+    setPage(1);
+  };
+
+  const clearDateFilter = () => {
+    setFromDate('');
+    setToDate('');
+    setPage(1);
+  };
+
+  const handleExport = async () => {
+    try {
+      setError('');
+      setExporting(true);
+      const { blob, filename } = await exportToExcelDrivers({
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+        search: search || undefined,
+        isAvailable: isAvailable !== undefined ? isAvailable : undefined,
+      });
+      downloadBlob(blob, filename || 'drivers.xlsx');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Export failed');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handlePageChange = (newPage: number) => {
@@ -124,7 +164,7 @@ const Drivers: React.FC = () => {
 
     return pages;
   };
-console.log("drivers",drivers);
+
   return (
     <div>
       <div className="mb-6">
@@ -134,34 +174,83 @@ console.log("drivers",drivers);
 
       {/* Search and Filter Section */}
       <div className="mb-4 bg-white p-4 rounded-lg shadow">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-              Search
-            </label>
-            <input
-              type="text"
-              id="search"
-              value={searchInput}
-              onChange={handleSearchChange}
-              placeholder="Search by name, phone, email..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                Search
+              </label>
+              <input
+                type="text"
+                id="search"
+                value={searchInput}
+                onChange={handleSearchChange}
+                placeholder="Search by name, phone, email..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="sm:w-48">
+              <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
+                Availability
+              </label>
+              <select
+                id="availability"
+                value={isAvailable === undefined ? 'all' : isAvailable.toString()}
+                onChange={handleAvailabilityChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All</option>
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            </div>
           </div>
-          <div className="sm:w-48">
-            <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
-              Availability
-            </label>
-            <select
-              id="availability"
-              value={isAvailable === undefined ? 'all' : isAvailable.toString()}
-              onChange={handleAvailabilityChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          <div className="flex flex-wrap items-end gap-4">
+            <div>
+              <label htmlFor="driver-from" className="block text-sm font-medium text-gray-700 mb-1">
+                From date
+              </label>
+              <input
+                id="driver-from"
+                type="date"
+                value={fromDate}
+                onChange={(e) => {
+                  setFromDate(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:w-40"
+              />
+            </div>
+            <div>
+              <label htmlFor="driver-to" className="block text-sm font-medium text-gray-700 mb-1">
+                To date
+              </label>
+              <input
+                id="driver-to"
+                type="date"
+                value={toDate}
+                onChange={(e) => {
+                  setToDate(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:w-40"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={clearDateFilter}
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <option value="all">All</option>
-              <option value="true">Available</option>
-              <option value="false">Unavailable</option>
-            </select>
+              Clear dates
+            </button>
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={exporting}
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {exporting ? 'Exporting...' : 'Export to Excel'}
+            </button>
           </div>
         </div>
       </div>

@@ -1,28 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllPatients, deletePatient } from '../services/api';
+import { getAllPatients, deletePatient, exportToExcelPatient } from '../services/api';
 import type { Patient } from '../types';
+
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
 
 const Patients: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchPatients();
-  }, []);
+  }, [fromDate, toDate]);
 
   const fetchPatients = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await getAllPatients();
-      setPatients(response.data);
+      const response = await getAllPatients({
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+      });
+      let list = response.data || [];
+      if (fromDate || toDate) {
+        list = list.filter((p) => {
+          const dateStr = p.createdAt || p.registerationDate;
+          if (!dateStr) return false;
+          const date = new Date(dateStr);
+          if (fromDate && date < new Date(fromDate)) return false;
+          if (toDate && date > new Date(toDate + 'T23:59:59.999Z')) return false;
+          return true;
+        });
+      }
+      setPatients(list);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch patients');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const clearDateFilter = () => {
+    setFromDate('');
+    setToDate('');
+  };
+
+  const handleExport = async () => {
+    try {
+      setError('');
+      setExporting(true);
+      const { blob, filename } = await exportToExcelPatient({
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+      });
+      downloadBlob(blob, filename || 'patients.xlsx');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Export failed');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -60,6 +109,51 @@ const Patients: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
         <p className="mt-1 text-sm text-gray-600">Total: {patients.length}</p>
+      </div>
+
+      {/* Date filter */}
+      <div className="mb-4 rounded-lg bg-white p-4 shadow">
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label htmlFor="patient-from" className="block text-sm font-medium text-gray-700 mb-1">
+              From date
+            </label>
+            <input
+              id="patient-from"
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:w-40"
+            />
+          </div>
+          <div>
+            <label htmlFor="patient-to" className="block text-sm font-medium text-gray-700 mb-1">
+              To date
+            </label>
+            <input
+              id="patient-to"
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:w-40"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={clearDateFilter}
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Clear dates
+          </button>
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exporting}
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {exporting ? 'Exporting...' : 'Export to Excel'}
+          </button>
+        </div>
       </div>
 
       {error && (

@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllRides } from '../services/api';
+import { getAllRides, exportToExcelRidesReport } from '../services/api';
 import type { Ride } from '../types';
+
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
 
 const Rides: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +24,7 @@ const Rides: React.FC = () => {
   const [rideStatus, setRideStatus] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   // Debounce search input
   useEffect(() => {
@@ -82,6 +94,24 @@ const Rides: React.FC = () => {
     setRideStatus('');
     setFromDate('');
     setToDate('');
+  };
+
+  const handleExport = async () => {
+    try {
+      setError('');
+      setExporting(true);
+      const { blob, filename } = await exportToExcelRidesReport({
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+        search: search || undefined,
+        rideStatus: rideStatus || undefined,
+      });
+      downloadBlob(blob, filename || 'rides-report.xlsx');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Export failed');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -177,12 +207,20 @@ const Rides: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-2">
           <button
             onClick={clearFilters}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Clear Filters
+          </button>
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exporting}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+          >
+            {exporting ? 'Exporting...' : 'Export to Excel'}
           </button>
         </div>
       </div>
