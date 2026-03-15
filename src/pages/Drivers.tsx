@@ -17,6 +17,14 @@ const downloadBlob = (blob: Blob, filename: string) => {
   a.remove();
   URL.revokeObjectURL(url);
 };
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return "N/A";
+  try {
+    return new Date(dateString).toLocaleString();
+  } catch {
+    return dateString;
+  }
+};
 
 const Drivers: React.FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -350,7 +358,7 @@ const Drivers: React.FC = () => {
                           {driver.driverLicenceNo || "N/A"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {driver.createdAt}
+                          {formatDate(driver.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {driver.ambulances?.length || 0}
