@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getAllDrivers, deleteDriver, exportToExcelDrivers } from '../services/api';
-import type { Driver } from '../types';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getAllDrivers,
+  deleteDriver,
+  exportToExcelDrivers,
+} from "../services/api";
+import type { Driver } from "../types";
 
 const downloadBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
@@ -17,14 +21,16 @@ const downloadBlob = (blob: Blob, filename: string) => {
 const Drivers: React.FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [isAvailable, setIsAvailable] = useState<boolean | undefined>(undefined);
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [isAvailable, setIsAvailable] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [exporting, setExporting] = useState(false);
@@ -47,7 +53,7 @@ const Drivers: React.FC = () => {
   const fetchDrivers = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
       const response = await getAllDrivers({
         page,
         limit,
@@ -60,7 +66,7 @@ const Drivers: React.FC = () => {
       setTotal(response.data.total);
       setTotalPages(response.data.totalPages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch drivers');
+      setError(err instanceof Error ? err.message : "Failed to fetch drivers");
     } finally {
       setLoading(false);
     }
@@ -70,21 +76,23 @@ const Drivers: React.FC = () => {
     setSearchInput(e.target.value);
   };
 
-  const handleAvailabilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleAvailabilityChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     const value = e.target.value;
-    setIsAvailable(value === 'all' ? undefined : value === 'true');
+    setIsAvailable(value === "all" ? undefined : value === "true");
     setPage(1);
   };
 
   const clearDateFilter = () => {
-    setFromDate('');
-    setToDate('');
+    setFromDate("");
+    setToDate("");
     setPage(1);
   };
 
   const handleExport = async () => {
     try {
-      setError('');
+      setError("");
       setExporting(true);
       const { blob, filename } = await exportToExcelDrivers({
         fromDate: fromDate || undefined,
@@ -92,9 +100,9 @@ const Drivers: React.FC = () => {
         search: search || undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
       });
-      downloadBlob(blob, filename || 'drivers.xlsx');
+      downloadBlob(blob, filename || "drivers.xlsx");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Export failed');
+      setError(err instanceof Error ? err.message : "Export failed");
     } finally {
       setExporting(false);
     }
@@ -115,8 +123,8 @@ const Drivers: React.FC = () => {
 
   const handleDelete = async (e: React.MouseEvent, driverId: string) => {
     e.stopPropagation(); // Prevent row click when clicking delete button
-    
-    if (!window.confirm('Are you sure you want to delete this driver?')) {
+
+    if (!window.confirm("Are you sure you want to delete this driver?")) {
       return;
     }
 
@@ -125,7 +133,7 @@ const Drivers: React.FC = () => {
       // Refresh the list after deletion
       fetchDrivers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete driver');
+      setError(err instanceof Error ? err.message : "Failed to delete driver");
     }
   };
 
@@ -143,21 +151,21 @@ const Drivers: React.FC = () => {
         for (let i = 1; i <= 4; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       } else if (page >= totalPages - 2) {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = totalPages - 3; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = page - 1; i <= page + 1; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       }
     }
@@ -177,7 +185,10 @@ const Drivers: React.FC = () => {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="search"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Search
               </label>
               <input
@@ -190,12 +201,17 @@ const Drivers: React.FC = () => {
               />
             </div>
             <div className="sm:w-48">
-              <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="availability"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Availability
               </label>
               <select
                 id="availability"
-                value={isAvailable === undefined ? 'all' : isAvailable.toString()}
+                value={
+                  isAvailable === undefined ? "all" : isAvailable.toString()
+                }
                 onChange={handleAvailabilityChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -207,7 +223,10 @@ const Drivers: React.FC = () => {
           </div>
           <div className="flex flex-wrap items-end gap-4">
             <div>
-              <label htmlFor="driver-from" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="driver-from"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 From date
               </label>
               <input
@@ -222,7 +241,10 @@ const Drivers: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="driver-to" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="driver-to"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 To date
               </label>
               <input
@@ -249,7 +271,7 @@ const Drivers: React.FC = () => {
               disabled={exporting}
               className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              {exporting ? 'Exporting...' : 'Export to Excel'}
+              {exporting ? "Exporting..." : "Export to Excel"}
             </button>
           </div>
         </div>
@@ -285,6 +307,9 @@ const Drivers: React.FC = () => {
                       License No
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Registraion Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ambulances
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -298,7 +323,10 @@ const Drivers: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {drivers.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
+                      <td
+                        colSpan={7}
+                        className="px-6 py-4 text-center text-sm text-gray-500"
+                      >
                         No drivers found
                       </td>
                     </tr>
@@ -310,22 +338,25 @@ const Drivers: React.FC = () => {
                         className="hover:bg-gray-50 cursor-pointer transition-colors"
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {driver.driverName || 'N/A'}
+                          {driver.driverName || "N/A"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {driver.phoneNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {driver.email || 'N/A'}
+                          {driver.email || "N/A"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {driver.driverLicenceNo || 'N/A'}
+                          {driver.driverLicenceNo || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {driver.createdAt?.length || 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {driver.ambulances?.length || 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {driver.isApproved ? 'Approved' : 'Pending'}
+                          {driver.isApproved ? "Approved" : "Pending"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
@@ -363,7 +394,7 @@ const Drivers: React.FC = () => {
 
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-700">
-                    Showing {drivers.length > 0 ? (page - 1) * limit + 1 : 0} to{' '}
+                    Showing {drivers.length > 0 ? (page - 1) * limit + 1 : 0} to{" "}
                     {Math.min(page * limit, total)} of {total} results
                   </span>
                 </div>
@@ -379,15 +410,17 @@ const Drivers: React.FC = () => {
 
                   {getPageNumbers().map((pageNum, index) => (
                     <React.Fragment key={index}>
-                      {pageNum === '...' ? (
-                        <span className="px-3 py-1 text-sm text-gray-700">...</span>
+                      {pageNum === "..." ? (
+                        <span className="px-3 py-1 text-sm text-gray-700">
+                          ...
+                        </span>
                       ) : (
                         <button
                           onClick={() => handlePageChange(pageNum as number)}
                           className={`px-3 py-1 text-sm font-medium rounded-md ${
                             page === pageNum
-                              ? 'bg-blue-600 text-white'
-                              : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
                           }`}
                         >
                           {pageNum}
