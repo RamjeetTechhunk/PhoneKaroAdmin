@@ -37,9 +37,7 @@ const Drivers: React.FC = () => {
   const [isAvailable, setIsAvailable] = useState<boolean | undefined>(
     undefined,
   );
-  const [isApproved, setIsApproved] = useState<boolean | undefined>(
-    undefined,
-  );
+  const [isApproved, setIsApproved] = useState<boolean | undefined>(undefined);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [total, setTotal] = useState(0);
@@ -248,9 +246,7 @@ const Drivers: React.FC = () => {
               </label>
               <select
                 id="approval"
-                value={
-                  isApproved === undefined ? "all" : isApproved.toString()
-                }
+                value={isApproved === undefined ? "all" : isApproved.toString()}
                 onChange={handleApprovalChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -349,7 +345,7 @@ const Drivers: React.FC = () => {
                       Registraion Date
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ambulances
+                      Address
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Account Status
@@ -392,7 +388,7 @@ const Drivers: React.FC = () => {
                           {formatDate(driver.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {driver.ambulances?.length || 0}
+                          {driver.address || ""}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {driver.isApproved ? "Approved" : "Pending"}
