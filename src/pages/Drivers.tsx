@@ -37,6 +37,9 @@ const Drivers: React.FC = () => {
   const [isAvailable, setIsAvailable] = useState<boolean | undefined>(
     undefined,
   );
+  const [isApproved, setIsApproved] = useState<boolean | undefined>(
+    undefined,
+  );
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [total, setTotal] = useState(0);
@@ -56,7 +59,7 @@ const Drivers: React.FC = () => {
 
   useEffect(() => {
     fetchDrivers();
-  }, [page, limit, search, isAvailable, fromDate, toDate]);
+  }, [page, limit, search, isAvailable, isApproved, fromDate, toDate]);
 
   const fetchDrivers = async () => {
     try {
@@ -67,6 +70,7 @@ const Drivers: React.FC = () => {
         limit,
         search: search || undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
+        isApproved: isApproved !== undefined ? isApproved : undefined,
         fromDate: fromDate || undefined,
         toDate: toDate || undefined,
       });
@@ -92,6 +96,12 @@ const Drivers: React.FC = () => {
     setPage(1);
   };
 
+  const handleApprovalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setIsApproved(value === "all" ? undefined : value === "true");
+    setPage(1);
+  };
+
   const clearDateFilter = () => {
     setFromDate("");
     setToDate("");
@@ -107,6 +117,7 @@ const Drivers: React.FC = () => {
         toDate: toDate || undefined,
         search: search || undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
+        isApproved: isApproved !== undefined ? isApproved : undefined,
       });
       downloadBlob(blob, filename || "drivers.xlsx");
     } catch (err) {
@@ -226,6 +237,26 @@ const Drivers: React.FC = () => {
                 <option value="all">All</option>
                 <option value="true">Available</option>
                 <option value="false">Unavailable</option>
+              </select>
+            </div>
+            <div className="sm:w-48">
+              <label
+                htmlFor="approval"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Account Status
+              </label>
+              <select
+                id="approval"
+                value={
+                  isApproved === undefined ? "all" : isApproved.toString()
+                }
+                onChange={handleApprovalChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All</option>
+                <option value="true">Approved</option>
+                <option value="false">Pending</option>
               </select>
             </div>
           </div>

@@ -64,7 +64,7 @@ const Rides: React.FC = () => {
       }
 
       const response = await getAllRides(params);
-      setRides(response.data);
+      setRides(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch rides');
     } finally {
@@ -278,20 +278,20 @@ const Rides: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(
-                            ride.rideStatus
+                            ride.rideStatus ?? ''
                           )}`}
                         >
-                          {ride.rideStatus.charAt(0).toUpperCase() + ride.rideStatus.slice(1)}
+                          {ride.rideStatus ? ride.rideStatus.charAt(0).toUpperCase() + ride.rideStatus.slice(1) : 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {ride.patientDetails.patientName || 'N/A'}
+                          {ride.patientDetails?.patientName || 'N/A'}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {ride.patientDetails.phoneNumber}
+                          {ride.patientDetails?.phoneNumber || 'N/A'}
                         </div>
-                        {ride.patientDetails.email && (
+                        {ride.patientDetails?.email && (
                           <div className="text-sm text-gray-500">{ride.patientDetails.email}</div>
                         )}
                       </td>
@@ -301,7 +301,7 @@ const Rides: React.FC = () => {
                             {ride.driverDetails.driverProfile && (
                               <img
                                 src={ride.driverDetails.driverProfile}
-                                alt={ride.driverDetails.driverName}
+                                alt={ride.driverDetails.driverName ?? ''}
                                 className="h-8 w-8 rounded-full mr-2 object-cover"
                               />
                             )}
@@ -310,7 +310,7 @@ const Rides: React.FC = () => {
                                 {ride.driverDetails.driverName || 'N/A'}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {ride.driverDetails.phoneNumber}
+                                {ride.driverDetails.phoneNumber || 'N/A'}
                               </div>
                             </div>
                           </div>

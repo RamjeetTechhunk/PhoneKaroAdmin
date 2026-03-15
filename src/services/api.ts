@@ -127,6 +127,7 @@ export const getAllDrivers = async (
     limit?: number;
     search?: string;
     isAvailable?: boolean;
+    isApproved?: boolean;
     fromDate?: string;
     toDate?: string;
   }
@@ -144,6 +145,9 @@ export const getAllDrivers = async (
   }
   if (params?.isAvailable !== undefined) {
     queryParams.append('isAvailable', params.isAvailable.toString());
+  }
+  if (params?.isApproved !== undefined) {
+    queryParams.append('isApproved', params.isApproved.toString());
   }
   if (params?.fromDate) {
     queryParams.append('fromDate', params.fromDate);
@@ -262,12 +266,14 @@ export const exportToExcelDrivers = async (params?: {
   toDate?: string;
   search?: string;
   isAvailable?: boolean;
+  isApproved?: boolean;
 }) => {
   const qs = new URLSearchParams();
   if (params?.fromDate) qs.append('fromDate', params.fromDate);
   if (params?.toDate) qs.append('toDate', params.toDate);
   if (params?.search) qs.append('search', params.search);
   if (params?.isAvailable !== undefined) qs.append('isAvailable', String(params.isAvailable));
+  if (params?.isApproved !== undefined) qs.append('isApproved', String(params.isApproved));
   const suffix = qs.toString() ? `?${qs.toString()}` : '';
   return fetchReportBlob(`${ROOT_API_URL}/report/export-to-excel-drivers${suffix}`);
 };
