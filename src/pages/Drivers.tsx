@@ -56,7 +56,7 @@ const Drivers: React.FC = () => {
 
   useEffect(() => {
     fetchDrivers();
-  }, [page, limit, search, isApproved, isAvailable, fromDate, toDate]);
+  }, [page, limit, search, isAvailable, fromDate, toDate]);
 
   const fetchDrivers = async () => {
     try {
@@ -66,7 +66,6 @@ const Drivers: React.FC = () => {
         page,
         limit,
         search: search || undefined,
-        isApproved: isAvailable !== undefined ? isApproved : undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
         fromDate: fromDate || undefined,
         toDate: toDate || undefined,
@@ -85,11 +84,6 @@ const Drivers: React.FC = () => {
     setSearchInput(e.target.value);
   };
 
-  const handleAppprovalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setIsAprroved(value === "all" ? undefined : value === "true");
-    setPage(1);
-  };
   const handleAvailabilityChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -112,7 +106,6 @@ const Drivers: React.FC = () => {
         fromDate: fromDate || undefined,
         toDate: toDate || undefined,
         search: search || undefined,
-        isApproved: isApproved !== undefined ? isApproved : undefined,
         isAvailable: isAvailable !== undefined ? isAvailable : undefined,
       });
       downloadBlob(blob, filename || "drivers.xlsx");
@@ -215,27 +208,6 @@ const Drivers: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <div className="sm:w-48">
-              <label
-                htmlFor="approval"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Availability
-              </label>
-              <select
-                id="approval"
-                value={
-                  isApproved=== undefined ? "all" : isApproved.toString()
-                }
-                onChange={handleAppprovalChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">All</option>
-                <option value="true">Approved</option>
-                <option value="false">Pending</option>
-              </select>
-            </div>
-          </div>
             <div className="sm:w-48">
               <label
                 htmlFor="availability"
