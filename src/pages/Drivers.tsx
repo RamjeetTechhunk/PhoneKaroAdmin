@@ -350,7 +350,7 @@ const Drivers: React.FC = () => {
                           {driver.driverLicenceNo || "N/A"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {driver.createdAt?.length || 0}
+                          {driver.createdAt}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {driver.ambulances?.length || 0}
