@@ -142,7 +142,13 @@ export interface Ride {
 export interface RidesResponse {
   code: number;
   message: string;
-  data: Ride[];
+  data: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    rides: Ride[];
+  };
 }
 
 // Ride Detail (from getRideStatus)
