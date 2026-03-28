@@ -166,7 +166,7 @@ export interface RideDetailData {
   ambulance?: {
     AmbulanceType: string;
     vehicleNumber: string;
-    description?: string;
+    discription?: string;
     image?: string;
   };
   source?: {
@@ -218,7 +218,7 @@ export interface AmbulanceType {
   slug: string;
   baseFare: string;
   fareRate: FareRateItem[];
-  description?: string;
+  discription?: string;
   image?: string;
   isDeleted?: boolean;
   createdAt?: string;

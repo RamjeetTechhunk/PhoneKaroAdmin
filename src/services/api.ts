@@ -455,7 +455,7 @@ export interface AddAmbulanceTypeRequest {
   slug: string;
   baseFare: string;
   fareRate: FareRateItem[];
-  description?: string;
+  discription?: string;
   image?: string;
 }
 
@@ -474,7 +474,7 @@ export interface UpdateAmbulanceTypeRequest {
   fareRate?: FareRateItem[];
   name?: string;
   slug?: string;
-  description?: string;
+  discription?: string;
   image?: string;
 }
 

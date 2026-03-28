@@ -199,10 +199,10 @@ const RideDetail: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700">Vehicle Number</label>
                       <p className="mt-1 text-sm text-gray-900">{ride.ambulance.vehicleNumber || 'N/A'}</p>
                     </div>
-                    {ride.ambulance.description && (
+                    {ride.ambulance.discription && (
                       <div className="col-span-2">
                         <label className="block text-sm font-medium text-gray-700">Description</label>
-                        <p className="mt-1 text-sm text-gray-900">{ride.ambulance.description}</p>
+                        <p className="mt-1 text-sm text-gray-900">{ride.ambulance.discription}</p>
                       </div>
                     )}
                     {ride.ambulance.image && (

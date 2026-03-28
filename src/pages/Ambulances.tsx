@@ -71,7 +71,8 @@ const Ambulances: React.FC = () => {
         ? item.fareRate.map((f) => ({ range: f.range, rate: f.rate }))
         : [...defaultFareRate]
     );
-    setDescription(item.description ?? '');
+
+    setDescription(item.discription ?? '');
     setImage(item.image ?? '');
   };
 
@@ -109,7 +110,7 @@ const Ambulances: React.FC = () => {
         slug: slug.trim(),
         baseFare: baseFare.trim(),
         fareRate: validFareRate,
-        description: description.trim() || undefined,
+        discription: description.trim() || undefined,
         image: image.trim() || undefined,
       });
       closeModals();
@@ -134,7 +135,7 @@ const Ambulances: React.FC = () => {
         fareRate: validFareRate.length ? validFareRate : undefined,
         name: name.trim() || undefined,
         slug: slug.trim() || undefined,
-        description: description.trim() || undefined,
+        discription: description.trim() || undefined,
         image: image.trim() || undefined,
       });
       closeModals();
