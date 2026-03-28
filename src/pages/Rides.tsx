@@ -64,7 +64,8 @@ const Rides: React.FC = () => {
       }
 
       const response = await getAllRides(params);
-      setRides(Array.isArray(response.data) ? response.data : []);
+      const ridesData = response.data?.rides ?? response.data;
+      setRides(Array.isArray(ridesData) ? ridesData : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch rides');
     } finally {
