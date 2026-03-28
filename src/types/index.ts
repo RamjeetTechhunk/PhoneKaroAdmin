@@ -137,6 +137,16 @@ export interface Ride {
   createdAt: string;
   driverDetails?: DriverDetails;
   patientDetails: PatientDetails;
+  source?: {
+    address: string;
+    latitude: string;
+    longitude: string;
+  };
+  destination?: {
+    address: string;
+    latitude: string;
+    longitude: string;
+  }[];
 }
 
 export interface RidesResponse {

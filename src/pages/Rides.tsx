@@ -255,6 +255,12 @@ const Rides: React.FC = () => {
                     Driver
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Origin
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Destination
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Created At
                   </th>
                 </tr>
@@ -262,7 +268,7 @@ const Rides: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {rides.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
                       No rides found
                     </td>
                   </tr>
@@ -318,6 +324,16 @@ const Rides: React.FC = () => {
                         ) : (
                           <span className="text-sm text-gray-400">No driver assigned</span>
                         )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px]">
+                        <div className="truncate" title={ride.source?.address || ''}>
+                          {ride.source?.address || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px]">
+                        <div className="truncate" title={ride.destination?.[0]?.address || ''}>
+                          {ride.destination?.[0]?.address || 'N/A'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(ride.createdAt)}
