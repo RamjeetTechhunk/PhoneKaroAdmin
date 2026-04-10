@@ -134,6 +134,7 @@ export interface Ride {
   _id: string;
   rideStatus: string;
   orderId: string;
+  driverId?: string;
   createdAt: string;
   driverDetails?: DriverDetails;
   patientDetails: PatientDetails;
@@ -147,6 +148,8 @@ export interface Ride {
     latitude: string;
     longitude: string;
   }[];
+  paymentStatus?: string;
+  paymentMode?: string;
 }
 
 export interface RidesResponse {

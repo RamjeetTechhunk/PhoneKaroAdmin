@@ -369,9 +369,31 @@ export const updateDriverApprovalStatus = async (
   });
 };
 
+// Update payment status
+export const updatePaymentStatus = async (
+  orderId: string,
+  paymentStatus: string,
+  paymentMode: string
+): Promise<{ code: number; message: string; data?: any }> => {
+  return apiCall<{ code: number; message: string; data?: any }>('/rideOrder/updatePaymentStatus', {
+    method: 'PUT',
+    body: JSON.stringify({ orderId, paymentStatus, paymentMode }),
+  });
+};
+
+// Close ride
+export const closeRide = async (orderId: string, driverId: string): Promise<{ code: number; message: string; data?: any }> => {
+  return apiCall<{ code: number; message: string; data?: any }>('/rideOrder/closeRide', {
+    method: 'PUT',
+    body: JSON.stringify({ orderId, driverId }),
+  });
+};
+
 // Get all rides
 export const getAllRides = async (
   params?: {
+    page?: number;
+    limit?: number;
     search?: string;
     rideStatus?: string;
     fromDate?: string;
@@ -379,7 +401,13 @@ export const getAllRides = async (
   }
 ): Promise<RidesResponse> => {
   const queryParams = new URLSearchParams();
-  
+
+  if (params?.page !== undefined) {
+    queryParams.append('page', params.page.toString());
+  }
+  if (params?.limit !== undefined) {
+    queryParams.append('limit', params.limit.toString());
+  }
   if (params?.search) {
     queryParams.append('search', params.search);
   }
