@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllRides, exportToExcelRidesReport, closeRide, updatePaymentStatus } from '../services/api';
+import { getAllRides, exportToExcelRidesReport, closeRide, updatePaymentStatus, getRideByOrderId } from '../services/api';
 import type { Ride } from '../types';
 
 const downloadBlob = (blob: Blob, filename: string) => {
@@ -150,17 +150,24 @@ const Rides: React.FC = () => {
 
   const handleCloseRide = async (e: React.MouseEvent, ride: Ride) => {
     e.stopPropagation();
-    if (!ride.driverId) {
-      setError('Cannot close ride: no driver assigned');
-      return;
-    }
     if (!window.confirm(`Are you sure you want to close ride ${ride.orderId}?`)) {
       return;
     }
     try {
       setClosingRideId(ride._id);
       setError('');
-      await closeRide(ride.orderId, ride.driverId);
+
+      let driverId = ride.driverId;
+      if (!driverId) {
+        const detail = await getRideByOrderId(ride.orderId);
+        driverId = detail.data?.[0]?.driverId;
+      }
+      if (!driverId) {
+        setError('Cannot close ride: no driver assigned');
+        return;
+      }
+
+      await closeRide(ride.orderId, driverId);
       await fetchRides();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to close ride');
