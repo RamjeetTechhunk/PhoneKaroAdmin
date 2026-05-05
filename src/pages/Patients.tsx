@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAllPatients, deletePatient, exportToExcelPatient } from '../services/api';
 import type { Patient } from '../types';
 
@@ -15,13 +15,22 @@ const downloadBlob = (blob: Blob, filename: string) => {
 };
 
 const Patients: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [fromDate, setFromDate] = useState(searchParams.get('fromDate') || '');
+  const [toDate, setToDate] = useState(searchParams.get('toDate') || '');
   const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
+
+  // Sync filters to URL search params
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (fromDate) params.fromDate = fromDate;
+    if (toDate) params.toDate = toDate;
+    setSearchParams(params, { replace: true });
+  }, [fromDate, toDate]);
 
   useEffect(() => {
     fetchPatients();

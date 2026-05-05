@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAllRides, exportToExcelRidesReport, closeRide, updatePaymentStatus, getRideByOrderId } from '../services/api';
 import type { Ride } from '../types';
 
@@ -16,21 +16,34 @@ const downloadBlob = (blob: Blob, filename: string) => {
 
 const Rides: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [rideStatus, setRideStatus] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+  const [rideStatus, setRideStatus] = useState(searchParams.get('rideStatus') || '');
+  const [fromDate, setFromDate] = useState(searchParams.get('fromDate') || '');
+  const [toDate, setToDate] = useState(searchParams.get('toDate') || '');
   const [exporting, setExporting] = useState(false);
   const [closingRideId, setClosingRideId] = useState<string | null>(null);
   const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [limit, setLimit] = useState(Number(searchParams.get('limit')) || 10);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  // Sync filters to URL search params
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (search) params.search = search;
+    if (rideStatus) params.rideStatus = rideStatus;
+    if (fromDate) params.fromDate = fromDate;
+    if (toDate) params.toDate = toDate;
+    if (page > 1) params.page = String(page);
+    if (limit !== 10) params.limit = String(limit);
+    setSearchParams(params, { replace: true });
+  }, [search, rideStatus, fromDate, toDate, page, limit]);
 
   // Debounce search input
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   getAllDrivers,
   deleteDriver,
@@ -27,23 +27,39 @@ const formatDate = (dateString: string | null) => {
 };
 
 const Drivers: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
   const [isAvailable, setIsAvailable] = useState<boolean | undefined>(
-    undefined,
+    searchParams.get("isAvailable") !== null ? searchParams.get("isAvailable") === "true" : undefined,
   );
-  const [isApproved, setIsApproved] = useState<boolean | undefined>(undefined);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [isApproved, setIsApproved] = useState<boolean | undefined>(
+    searchParams.get("isApproved") !== null ? searchParams.get("isApproved") === "true" : undefined,
+  );
+  const [fromDate, setFromDate] = useState(searchParams.get("fromDate") || "");
+  const [toDate, setToDate] = useState(searchParams.get("toDate") || "");
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [exporting, setExporting] = useState(false);
   const navigate = useNavigate();
+
+  // Sync filters to URL search params
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (search) params.search = search;
+    if (isAvailable !== undefined) params.isAvailable = String(isAvailable);
+    if (isApproved !== undefined) params.isApproved = String(isApproved);
+    if (fromDate) params.fromDate = fromDate;
+    if (toDate) params.toDate = toDate;
+    if (page > 1) params.page = String(page);
+    if (limit !== 10) params.limit = String(limit);
+    setSearchParams(params, { replace: true });
+  }, [search, isAvailable, isApproved, fromDate, toDate, page, limit]);
 
   // Debounce search input
   useEffect(() => {
