@@ -81,7 +81,7 @@ const DriverDetail: React.FC = () => {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <button
-              onClick={() => navigate("/drivers")}
+              onClick={() => navigate(-1)}
               className="flex items-center text-gray-600 hover:text-gray-900 mb-2"
             >
               <svg

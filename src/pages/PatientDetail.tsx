@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getPatientById } from '../services/api';
-import type { Patient } from '../types';
-import Layout from '../components/Layout';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getPatientById } from "../services/api";
+import type { Patient } from "../types";
+import Layout from "../components/Layout";
 
 const PatientDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -22,23 +22,25 @@ const PatientDetail: React.FC = () => {
 
     try {
       setLoading(true);
-      setError('');
+      setError("");
       const response = await getPatientById(id);
       // API returns an array with a single patient
       if (response.data && response.data.length > 0) {
         setPatient(response.data[0]);
       } else {
-        setError('Patient not found');
+        setError("Patient not found");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch patient details');
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch patient details",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     try {
       return new Date(dateString).toLocaleString();
     } catch {
@@ -52,7 +54,7 @@ const PatientDetail: React.FC = () => {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <button
-              onClick={() => navigate('/patients')}
+              onClick={() => navigate(-1)}
               className="flex items-center text-gray-600 hover:text-gray-900 mb-2"
             >
               <svg
@@ -70,7 +72,9 @@ const PatientDetail: React.FC = () => {
               </svg>
               Back to Patients
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">Patient Details</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Patient Details
+            </h1>
           </div>
         </div>
 
@@ -89,72 +93,119 @@ const PatientDetail: React.FC = () => {
             <div className="px-6 py-4 space-y-6">
               {/* Basic Information */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Basic Information
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Patient ID</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Patient ID
+                    </label>
                     <p className="mt-1 text-sm text-gray-900">{patient._id}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Patient Name</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.patientName || 'N/A'}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Patient Name
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.patientName || "N/A"}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.phoneNumber}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Phone Number
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.phoneNumber}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Alternate Phone</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.alternatePhoneNumber || 'N/A'}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Alternate Phone
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.alternatePhoneNumber || "N/A"}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.email || 'N/A'}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.email || "N/A"}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Gender</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.gendar || 'N/A'}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Gender
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.gendar || "N/A"}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Reference Code</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.refCode || 'N/A'}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Reference Code
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.refCode || "N/A"}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Registration Date</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(patient.registerationDate)}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Registration Date
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {formatDate(patient.registerationDate)}
+                    </p>
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Address</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.address || 'N/A'}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Address
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.address || "N/A"}
+                    </p>
                   </div>
 
                   {patient.lat && patient.long && (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Latitude</label>
-                        <p className="mt-1 text-sm text-gray-900">{patient.lat}</p>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Latitude
+                        </label>
+                        <p className="mt-1 text-sm text-gray-900">
+                          {patient.lat}
+                        </p>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Longitude</label>
-                        <p className="mt-1 text-sm text-gray-900">{patient.long}</p>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Longitude
+                        </label>
+                        <p className="mt-1 text-sm text-gray-900">
+                          {patient.long}
+                        </p>
                       </div>
                     </>
                   )}
 
                   {patient.location && (
                     <div className="col-span-2">
-                      <label className="block text-sm font-medium text-gray-700">Location Coordinates</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Location Coordinates
+                      </label>
                       <p className="mt-1 text-sm text-gray-900">
-                        Long: {patient.location.coordinates[0]}, Lat: {patient.location.coordinates[1]}
+                        Long: {patient.location.coordinates[0]}, Lat:{" "}
+                        {patient.location.coordinates[1]}
                       </p>
                     </div>
                   )}
@@ -163,31 +214,41 @@ const PatientDetail: React.FC = () => {
 
               {/* Additional Information */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Additional Information
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">User Type</label>
-                    <p className="mt-1 text-sm text-gray-900">{patient.userType}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Notification ID</label>
-                    <p className="mt-1 text-sm text-gray-900 break-all">
-                      {patient.notification_id || 'N/A'}
+                    <label className="block text-sm font-medium text-gray-700">
+                      User Type
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {patient.userType}
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Is Deleted</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Notification ID
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900 break-all">
+                      {patient.notification_id || "N/A"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Is Deleted
+                    </label>
                     <p className="mt-1">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           patient.isDeleted
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-green-100 text-green-800'
+                            ? "bg-red-100 text-red-800"
+                            : "bg-green-100 text-green-800"
                         }`}
                       >
-                        {patient.isDeleted ? 'Yes' : 'No'}
+                        {patient.isDeleted ? "Yes" : "No"}
                       </span>
                     </p>
                   </div>
@@ -196,16 +257,26 @@ const PatientDetail: React.FC = () => {
 
               {/* Timestamps */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Timestamps</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Timestamps
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Created At</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(patient.createdAt)}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Created At
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {formatDate(patient.createdAt)}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Updated At</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(patient.updatedAt)}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Updated At
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {formatDate(patient.updatedAt)}
+                    </p>
                   </div>
                 </div>
               </div>
